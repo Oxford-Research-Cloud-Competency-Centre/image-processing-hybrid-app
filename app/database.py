@@ -8,10 +8,17 @@ load_dotenv()
 
 # Fetch environment variables
 REGION_NAME = os.getenv('REGION_NAME')
+AWS_PROFILE = os.getenv('AWS_PROFILE')
 IMAGE_METADATA_TABLE = os.getenv('IMAGE_METADATA_TABLE')
 
+# Create a Boto3 session with profile
+if AWS_PROFILE:
+    session = boto3.Session(profile_name=AWS_PROFILE, region_name=REGION_NAME)
+else:
+    session = boto3.Session(region_name=REGION_NAME)
+
 # Create DynamoDB client with the specified region
-dynamodb = boto3.resource('dynamodb', region_name=REGION_NAME)
+dynamodb = session.resource('dynamodb')
 
 table = dynamodb.Table(IMAGE_METADATA_TABLE)
 
