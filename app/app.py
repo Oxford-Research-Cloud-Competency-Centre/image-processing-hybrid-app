@@ -19,13 +19,19 @@ app = Flask(__name__)
 # Fetch environment variables
 REGION_NAME = os.getenv('REGION_NAME')
 S3_BUCKET = os.getenv('S3_BUCKET')
+AWS_PROFILE = os.getenv('AWS_PROFILE')
 
-# Create S3 client with the specified region
-s3 = boto3.client(
-    's3', 
-    region_name=REGION_NAME,
+# Use profile if provided
+if AWS_PROFILE:
+    session = boto3.Session(profile_name=AWS_PROFILE, region_name=REGION_NAME)
+else:
+    session = boto3.Session(region_name=REGION_NAME)
+
+# Create S3 client from session
+s3 = session.client(
+    's3',
     config=boto3.session.Config(s3={'addressing_style': 'path'}, signature_version='s3v4')
-    )
+)
 
 @app.route('/')
 def index():
